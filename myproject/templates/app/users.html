@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Everyone's Profiles{% endblock %}
+
+{% block content %}
+	<h2>Everyone's Profiles</h2>
+	<table>
+		<thead>
+			<tr>
+			<th>Usernames</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for username in usernames %}
+			<tr>
+				<!--<td><a href="app/users/{{username}}">{{username}}</a></td>-->
+				{% url 'profile_by_username' %}
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}

@@ -6,6 +6,9 @@
 {% if user.is_authenticated %}
   Hi {{ user.username }}!
   <p><a href="{% url 'logout' %}">Log Out</a></p>
+  <p><a href="app/userlist">See other people's profiles</a></p>
+  <p><a href="app/images/allimages">See all images</a></p>
+  <p><a href="{% url 'my_profile' %}">My Profile</a></p>
 {% else %}
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">Log In</a>

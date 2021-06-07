@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Image{% endblock %}
+
+{% block content %}
+	<h2>Image</h2>
+	<table>
+		<thead>
+			<tr>
+			<th>Posted by: {{image_info.3}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>{{ image_info.4 }}</td>
+			</tr>
+			<tr>
+				<td>Posted at: {{ image_info.2}}</td>
+			</tr>
+			<tr>
+				<td>{{ image_info.1 }}</td>
+			</tr>
+		</tbody>
+	</table>
+{% endblock %}
