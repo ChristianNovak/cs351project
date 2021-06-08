@@ -3,6 +3,7 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
+<a href="/">Take me home</a>
 	<h2>{{username}}'s Profile</h2>
 		<thead>
 			<tr>
@@ -12,7 +13,7 @@
 		<tbody>
 			{% for image in images %}
 			<tr>
-				<td>{{ image.0 }}</td>
+				<td><a href="/app/images/{{image.0}}"><img src="/media/{{ image.1 }}"</a></td>
 			</tr>
 			{% endfor %}
 		</tbody>

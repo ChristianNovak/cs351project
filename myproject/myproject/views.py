@@ -2,9 +2,11 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from app.models import Image
-from app.forms import ImageForm
-from datetime import datetime
+from app.forms import ImageForm, CommentForm
+from datetime import date
 import MySQLdb
+from PIL import Image
+from django import forms
 
 def signup(request):
 	if request.method == 'POST':
@@ -13,17 +15,8 @@ def signup(request):
 			form.save()
 			username = form.cleaned_data.get('username')
 			raw_password = form.cleaned_data.get('password1')
-			#Custom database stuff here
-			dbconnect = MYSQLdb.connect('localhost', 'root', 'password', 'app_data')
-			cursor = dbconnect.cursor()
-			sql = 'INSERT INTO users (username, created_at) VALUES (%s, %s);'
-			val = (username, datetime.now())
-			cursor.execute(sql, val)
-			dbconnect.close
-			#End custom db stuff
 			user = authenticate(username=username, password=raw_password)
 			login(request, user)
-			
 			return redirect('home')
 	else:
 		form = UserCreationForm()
@@ -31,64 +24,78 @@ def signup(request):
 
 #Retrieve list of usernames from database table to populate the user index page with hyperlinks to user profiles
 def listUsers(request):
-	dbconnect = MySQLdb.connect('localhost', 'root', 'password', 'app_data')
+	dbconnect = MySQLdb.connect('localhost', 'djangouser', 'password', 'test_data')
 	cursor = dbconnect.cursor()
-	cursor.execute('SELECT * FROM `users`;')
+	cursor.execute('SELECT * FROM `auth_user`;')
 	usernames = cursor.fetchall()
-	for username in usernames:
-		print(username[0])
 	dbconnect.close()
-
 	return render(request, 'app/userlist.html', {'usernames': usernames})
 
 def profile(request, username):
 	if request.user.username == username:
 		return myProfile(request)
 	else:
-		dbconnect = MySQLdb.connect('localhost', 'root', 'password', 'app_data')
+		dbconnect = MySQLdb.connect('localhost', 'djangouser', 'password', 'test_data')
 		cursor = dbconnect.cursor()
-		cursor.execute('SELECT image_data FROM `images` WHERE user_id = %s;', [username])
+		cursor.execute('SELECT * FROM `app_image` WHERE username = %s;', [username])
 		images = cursor.fetchall()
 		dbconnect.close()
 		return render(request, 'app/users/profile.html', {'username': username, 'images': images})
 		
 def myProfile(request):
-	dbconnect = MySQLdb.connect('localhost', 'root', 'password', 'app_data')
+	dbconnect = MySQLdb.connect('localhost', 'djangouser', 'password', 'test_data')
 	cursor = dbconnect.cursor()
-	cursor.execute('SELECT image_data FROM `images` WHERE user_id = %s;', [request.user.username])
+	cursor.execute('SELECT * FROM `app_image` WHERE username = %s;', [request.user.username])
 	images = cursor.fetchall()
 	dbconnect.close()
 	return render (request, 'app/myprofile.html', {'images': images})
 
 def imageView(request, image_id):
-	dbconnect = MySQLdb.connect('localhost', 'root', 'password', 'app_data')
+	
+	dbconnect = MySQLdb.connect('localhost', 'djangouser', 'password', 'test_data')
 	cursor = dbconnect.cursor()
-	cursor.execute('SELECT * FROM `images` WHERE image_id = %s;', [image_id])
+	cursor.execute('SELECT * FROM `app_image` WHERE id = %s;', [image_id])
 	image_info = cursor.fetchone()
-	cursor.execute('SELECT * FROM `comments` WHERE image_id = %s;', [image id])
+	cursor.execute('SELECT * FROM `app_comment` WHERE parent_image = %s;', [image_id])
 	comments = cursor.fetchall()
 	dbconnect.close()
-	return render (request, 'app/images/image.html', {'image_info': image_info, 'comments': comments})
+	return render (request, 'app/images/image.html', {'image_info': image_info, 'comments':comments})
 
 def uploadView(request):
 	if request.method == 'POST':
 		form = ImageForm(request.POST, request.FILES)
-		#if form.is_valid(): #I should really fix this but PIL refuses to be imported
-		#dbconnect = MYSQLdb.connect('localhost', 'root', 'password', 'app_data')
-		#cursor = dbconnect.cursor()
-		#sql = 'INSERT INTO images (caption, posted_at, user_id, image_data) VALUES (%s, %s, %s, %s);'
-		#val = (form.caption, datetime.now(), request.user.username, form.image)
-		#cursor.execute(sql, val)
-		#dbconnect.close
+		if form.is_valid():
+			form.save()
 		return myProfile(request)
 	else:
 		form = ImageForm()
+		form.fields['username'].widget = forms.HiddenInput()
+		form.fields['username'].initial = request.user.username
+		form.fields['posted_on'].widget = forms.HiddenInput()
+		form.fields['posted_on'].initial = date.today()
 	return render(request, 'app/upload.html', {'form' : form})
 
 def allImages(request):
-	dbconnect = MySQLdb.connect('localhost', 'root', 'password', 'app_data')
+	dbconnect = MySQLdb.connect('localhost', 'djangouser', 'password', 'test_data')
 	cursor = dbconnect.cursor()
-	cursor.execute('SELECT * FROM `images`')
-	image_info = cursor.fetchall()
+	cursor.execute('SELECT * FROM `app_image`')
+	images = cursor.fetchall()
 	dbconnect.close()
-	return render (request, 'app/images/allimages.html', {'image_info': image_info})
+	return render (request, 'app/images/allimages.html', {'images': images})
+
+def addComment(request):
+	if request.method == 'POST':
+		form = CommentForm(request.POST)
+		if form.is_valid():
+			form.save()
+		return redirect('my_profile')
+	else:
+		imageurl = request.META.get('HTTP_REFERER')
+		form = CommentForm()
+		form.fields['parent_image'].widget = forms.HiddenInput()
+		form.fields['parent_image'].initial = int(imageurl.split('/')[-1])
+		form.fields['username'].widget = forms.HiddenInput()
+		form.fields['username'].initial = request.user.username
+		form.fields['posted_on'].widget = forms.HiddenInput()
+		form.fields['posted_on'].initial = date.today()
+		return render (request, 'app/addcomment.html', {'form': form})

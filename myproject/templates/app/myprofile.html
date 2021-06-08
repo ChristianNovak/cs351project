@@ -3,9 +3,10 @@
 {% block title %}My Profile{% endblock %}
 
 {% block content %}
+<a href="/">Take me home</a>
 	<h2>My Profile</h2>
 	<h3>{{user.username}}</h3>
-	<form action = "../../app/upload">
+	<form action = "/app/upload">
 		<input type="submit" value="Upload a New Image" />
 	</form>
 	<table>
@@ -17,7 +18,7 @@
 		<tbody>
 			{% for image in images %}
 			<tr>
-				<td>{{ image.0 }}</td>
+				<td><a href="/app/images/{{image.0}}"><img src="/media/{{ image.1 }}"</a></td>
 			</tr>
 			{% endfor %}
 		</tbody>

@@ -30,5 +30,6 @@ urlpatterns = [
     path('app/images/<int:image_id>', views.imageView, name = 'view_image'),
     path('app/upload/', views.uploadView, name = 'upload_image'),
     path('app/images/allimages/', views.allImages, name = 'all_images'),
+    path('app/addcomment/', views.addComment, name = 'add_comment'),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

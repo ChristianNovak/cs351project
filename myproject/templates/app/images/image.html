@@ -3,23 +3,39 @@
 {% block title %}Image{% endblock %}
 
 {% block content %}
+<a href="/">Take me home</a>
 	<h2>Image</h2>
 	<table>
 		<thead>
 			<tr>
-			<th>Posted by: {{image_info.3}}</th>
+			<th>Posted by: <a href="/app/users/{{image_info.3}}">{{image_info.3}}</a></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr>
-				<td>{{ image_info.4 }}</td>
+				<td><img src="/media/{{ image_info.1 }}"</td>
 			</tr>
 			<tr>
-				<td>Posted at: {{ image_info.2}}</td>
+				<td>Posted on: {{ image_info.4}}</td>
 			</tr>
-			<tr>
-				<td>{{ image_info.1 }}</td>
-			</tr>
+			
 		</tbody>
 	</table>
+	<table>
+		<thead>
+			<tr>
+			<th>Comments:</a></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for comment in comments %}
+			<tr>
+				<td>{{comment.1}} - <a href="/app/users/{{comment.3}}">{{comment.3}}</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<form action = "/app/addcomment">
+		<input type="submit" value="Add Comment" />
+	</form>
 {% endblock %}

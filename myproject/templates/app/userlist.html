@@ -3,6 +3,7 @@
 {% block title %}Everyone's Profiles{% endblock %}
 
 {% block content %}
+<a href="/">Take me home</a>
 	<h2>Everyone's Profiles</h2>
 	<table>
 		<thead>
@@ -13,7 +14,7 @@
 		<tbody>
 			{% for username in usernames %}
 			<tr>
-				<td><a href="{% url 'profile_by_username' username=username.0%}">{{username.0}}</a></td>
+				<td><a href="{% url 'profile_by_username' username=username.4%}">{{username.4}}</a></td>
 			</tr>
 			{% endfor %}
 		</tbody>

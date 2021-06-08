@@ -3,17 +3,18 @@
 {% block title %}Images{% endblock %}
 
 {% block content %}
+<a href="/">Take me home</a>
 	<h2>Image</h2>
 	<thead>
 			<tr>
-			<th>All Images</th>
+				<th>All Images</th>
 			</tr>
-		</thead>
-		<tbody>
-			{% for image in images %}
-			<tr>
-				<td>{{ image.0 }}</td>
-			</tr>
-			{% endfor %}
-		</tbody>
+	</thead>
+	<tbody>
+		{% for image in images %}
+		<tr>
+			<td><a href="/app/images/{{image.0}}"><img src="/media/{{ image.1 }}"</a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
 {% endblock %}
